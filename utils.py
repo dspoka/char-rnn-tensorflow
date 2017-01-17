@@ -30,8 +30,8 @@ class TextLoader():
         counter = collections.Counter(data)
         count_pairs = sorted(counter.items(), key=lambda x: -x[1])
         self.chars, _ = zip(*count_pairs)
-        self.vocab_size = len(self.chars)
         self.vocab = dict(zip(self.chars, range(len(self.chars))))
+        self.vocab_size = len(self.chars)
         with open(vocab_file, 'wb') as f:
             cPickle.dump(self.chars, f)
         self.tensor = np.array(list(map(self.vocab.get, data)))
@@ -59,6 +59,10 @@ class TextLoader():
         ydata = np.copy(self.tensor)
         ydata[:-1] = xdata[1:]
         ydata[-1] = xdata[0]
+        # tensor is the entire file of characters
+        # y becomes the next character
+        # also size of tensor is smaller than the size of the file
+        # so the end is not used
         self.x_batches = np.split(xdata.reshape(self.batch_size, -1), self.num_batches, 1)
         self.y_batches = np.split(ydata.reshape(self.batch_size, -1), self.num_batches, 1)
 

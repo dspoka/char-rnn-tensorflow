@@ -37,8 +37,11 @@ class Model():
                 inputs = [tf.squeeze(input_, [1]) for input_ in inputs]
 
         def loop(prev, _):
+            # ??? is this loop function being called
             prev = tf.matmul(prev, softmax_w) + softmax_b
+            # tf.stop_gradient disallows the gradient to backpropagate
             prev_symbol = tf.stop_gradient(tf.argmax(prev, 1))
+            # ??? tf.nn.embedding lookup
             return tf.nn.embedding_lookup(embedding, prev_symbol)
 
         outputs, last_state = seq2seq.rnn_decoder(inputs, self.initial_state, cell, loop_function=loop if infer else None, scope='rnnlm')
