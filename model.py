@@ -42,8 +42,10 @@ class Model():
             # tf.stop_gradient disallows the gradient to backpropagate
             prev_symbol = tf.stop_gradient(tf.argmax(prev, 1))
             # ??? tf.nn.embedding lookup
+            # prev symbol is index. returns vector of the symbol.
             return tf.nn.embedding_lookup(embedding, prev_symbol)
-
+        # tensorboard
+        self.embedding = embedding
         outputs, last_state = seq2seq.rnn_decoder(inputs, self.initial_state, cell, loop_function=loop if infer else None, scope='rnnlm')
         output = tf.reshape(tf.concat(1, outputs), [-1, args.rnn_size])
         self.logits = tf.matmul(output, softmax_w) + softmax_b

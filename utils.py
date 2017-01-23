@@ -31,7 +31,18 @@ class TextLoader():
         count_pairs = sorted(counter.items(), key=lambda x: -x[1])
         self.chars, _ = zip(*count_pairs)
         self.vocab = dict(zip(self.chars, range(len(self.chars))))
+
+        # ADD to files
+        self.vocab['<s>'] = len(self.chars)
+        self.vocab['</s>'] = len(self.chars) + 1
+
+        self.chars = tuple(list(self.chars) + [u'<s>', u'</s>'])
         self.vocab_size = len(self.chars)
+
+        print "Chars, "self.chars
+        print "Vocab size, "self.vocab_size
+        print "Vocab, "self.vocab
+
         with open(vocab_file, 'wb') as f:
             cPickle.dump(self.chars, f)
         self.tensor = np.array(list(map(self.vocab.get, data)))
@@ -43,6 +54,9 @@ class TextLoader():
         self.vocab_size = len(self.chars)
         self.vocab = dict(zip(self.chars, range(len(self.chars))))
         self.tensor = np.load(tensor_file)
+        print "vocab size: ", self.vocab_size
+        print "Vocab: ", self.vocab
+        # print "tensor", self.tensor
         self.num_batches = int(self.tensor.size / (self.batch_size *
                                                    self.seq_length))
 

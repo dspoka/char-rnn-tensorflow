@@ -8,28 +8,28 @@ import os
 from six.moves import cPickle
 
 from utils import TextLoader
-from model import Model
+from new_model import Model
 
 np.set_printoptions(threshold=np.nan)
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_dir', type=str, default='data/tinyshakespeare',
+    parser.add_argument('--data_dir', type=str, default='data/toy_messages/',
                        help='data directory containing input.txt')
-    parser.add_argument('--save_dir', type=str, default='save',
+    parser.add_argument('--save_dir', type=str, default='toy_save',
                        help='directory to store checkpointed models')
-    parser.add_argument('--rnn_size', type=int, default=3,
+    parser.add_argument('--rnn_size', type=int, default=24,
                        help='size of RNN hidden state')
     parser.add_argument('--num_layers', type=int, default=2,
                        help='number of layers in the RNN')
     parser.add_argument('--model', type=str, default='lstm',
                        help='rnn, gru, or lstm')
-    parser.add_argument('--batch_size', type=int, default=4,
+    parser.add_argument('--batch_size', type=int, default=20,
                        help='minibatch size')
-    parser.add_argument('--seq_length', type=int, default=5,
+    parser.add_argument('--seq_length', type=int, default=4,
                        help='RNN sequence length')
-    parser.add_argument('--num_epochs', type=int, default=50,
+    parser.add_argument('--num_epochs', type=int, default=500,
                        help='number of epochs')
     parser.add_argument('--save_every', type=int, default=1000,
                        help='save frequency')
@@ -39,6 +39,8 @@ def main():
                        help='learning rate')
     parser.add_argument('--decay_rate', type=float, default=0.97,
                        help='decay rate for rmsprop')
+    parser.add_argument('--sample_bool', type=bool, default=False,
+                       help='Sampling the Sequence')
     parser.add_argument('--init_from', type=str, default=None,
                        help="""continue training from saved model at this path. Path must contain files saved by previous training process:
                             'config.pkl'        : configuration;
@@ -105,15 +107,28 @@ def train(args):
                 # passing values in the list, returns their actual value back in the same order.
                 # the last one is the optimizer and its special
                 # model.probs, x, y
-                train_loss, state, probs, embedding, _ = sess.run([model.cost, model.final_state, model.probs, model.embedding, model.train_op], feed)
-                print("x", x, x.shape)
-                print
-                print("y", y, x.shape)
-                print
-                print("probs", probs, probs.shape)
-                print
-                print("embedding", embedding, embedding.shape)
-                os.exit()
+                train_loss, state, probs, embedding, encoder_inputs, decoder_inputs, logits, targets, _ = sess.run([model.cost, model.final_state,
+                                                                     model.probs, model.embedding,
+                                                                     model.encoder_inputs, model.decoder_inputs,
+                                                                     model.logits, model.targets, model.train_op], feed)
+
+                # print('\n')
+                # print("encoder_inputs", encoder_inputs, len(encoder_inputs))
+                # print('\n')
+                # print("decoder_inputs", decoder_inputs, len(decoder_inputs))
+                # print('\n')
+                # print("x", x, x.shape)
+                # print('\n')
+                # print("y", y, x.shape)
+                # print('\n')
+                # print("logits",logits.shape)
+                # print("targets",targets.shape)
+                # os.exit()
+                # print
+                # print("probs", probs, probs.shape)
+                # print
+                # print("embedding", embedding, embedding.shape)
+                # os.exit()
 
                 end = time.time()
                 print("{}/{} (epoch {}), train_loss = {:.3f}, time/batch = {:.3f}" \
